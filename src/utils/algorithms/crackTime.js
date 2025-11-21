@@ -3,6 +3,7 @@
 
 const GPU_SPEEDS = {
     // Hashes per second
+    'Online': 1000,        // 1K/s (Throttled online attack)
     'MD5': 164000000000, // 164 GH/s
     'SHA256': 22000000000, // 22 GH/s
     'Bcrypt': 120000,      // 120 kH/s (Slow!)
@@ -26,11 +27,13 @@ export const calculateCrackTime = (entropy) => {
     // We use SHA256 as a "standard" fast hash for general web security context
     // And Bcrypt for "secure" context
 
+    const timeOnline = keyspace / GPU_SPEEDS['Online'];
     const timeMD5 = keyspace / GPU_SPEEDS['MD5'];
     const timeSHA256 = keyspace / GPU_SPEEDS['SHA256'];
     const timeBcrypt = keyspace / GPU_SPEEDS['Bcrypt'];
 
     return {
+        online: formatTime(timeOnline),
         md5: formatTime(timeMD5),
         sha256: formatTime(timeSHA256),
         bcrypt: formatTime(timeBcrypt),

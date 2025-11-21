@@ -12,7 +12,7 @@ export const analyzePassword = (password) => {
         return {
             score: 0,
             entropy: 0,
-            crackTime: { md5: 'Instant', sha256: 'Instant', bcrypt: 'Instant' },
+            crackTime: { online: 'Instant', md5: 'Instant', sha256: 'Instant', bcrypt: 'Instant' },
             warnings: [],
             details: {}
         };
