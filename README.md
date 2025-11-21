@@ -1,6 +1,8 @@
 # 🔐 Advanced Password Strength Analyzer
 
-A state-of-the-art password security analysis tool powered by modern AI-resistance algorithms, neural network guessability scoring (NNGS), and comprehensive pattern detection. Built with React and featuring a stunning cyberpunk UI.
+A state-of-the-art password security analysis tool powered by modern AI-resistance algorithms, neural network guessability scoring (NNGS), comprehensive pattern detection, and **client-side breach checking**. Built with React and featuring a stunning cyberpunk UI with educational content and advanced password generation capabilities.
+
+> **🔒 Privacy-First**: 100% client-side processing - your passwords never leave your device!
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg)
@@ -113,14 +115,111 @@ Calculates the time required to crack your password using real-world hashcat ben
 
 ---
 
+### 🔒 Privacy & Security Features
+
+#### **100% Client-Side Processing**
+- **Zero Network Requests**: All analysis happens in your browser
+- **No Data Transmission**: Passwords never sent to any server
+- **No Logging**: Nothing is stored or tracked
+- **Open Source**: Full transparency - inspect the code yourself
+
+#### **Breach Database Checking**
+Client-side comparison against 250+ most common breached passwords:
+- Exact match detection
+- Common pattern recognition (keyboard walks, sequences)
+- l33t speak variation detection
+- **Penalties**: 20-60 bits of entropy reduction for breached passwords
+
+#### **Privacy Statement Modal**
+- Detailed privacy policy accessible via footer
+- Explanation of all dependencies
+- Instructions to verify no network activity using DevTools
+
+---
+
+### 🎓 Educational Features
+
+#### **How It Works Modal**
+- **Algorithm Explanations**: Detailed descriptions of all 5 core algorithms
+- **Visual Examples**: Strong vs. weak password comparisons
+- **Educational Content**: Learn what makes passwords secure
+- **Keyboard Shortcut**: Press `Ctrl+I` to open
+
+#### **Educational Tips Section**
+- Password manager recommendations (Bitwarden, 1Password, LastPass)
+- Multi-Factor Authentication (MFA) guidance
+- Best practices for unique passwords
+- Links to external security resources (HIBP, EFF, NIST)
+- Pro tips for passphrase usage
+
+---
+
+### 🔑 Advanced Password Generation
+
+#### **4 Generation Modes**
+1. **Random Strong**: Cryptographically secure random passwords
+   - Configurable length (8-64 characters)
+   - Character type toggles (uppercase, lowercase, numbers, symbols, Unicode)
+   - Uses `crypto.getRandomValues()` for true randomness
+
+2. **Pronounceable**: Easier to remember passwords
+   - Consonant-vowel-consonant syllable patterns
+   - Capitalized first letter
+   - Ends with number or symbol
+
+3. **Passphrase**: Word-based security
+   - 4-5 random words from curated list
+   - 1-2 numbers inserted randomly
+   - Variable or mixed separators
+   - Example: `Quantum47-Phoenix!Delta92`
+
+4. **Emoji Enhanced**: Unicode character support
+   - Words combined with emoji
+   - Example: `Tech🚀Cyber🔒Secure⚡Node🌟`
+
+#### **Generator Features**
+- One-click copy to clipboard
+- Live strength analysis of generated passwords
+- Advanced options panel
+- Unicode character support (★☆♦♣♠♥€¥£)
+- Collapsible interface (toggle with `Ctrl+G`)
+
+---
+
+### ⚙️ Technical Enhancements
+
+#### **Long Password Support (64+ characters)**
+- Auto-switches to textarea for passwords longer than 64 characters
+- Smooth resizing and masked display
+- Handles up to 128 characters
+- No performance degradation
+
+#### **Unicode Support**
+- Full emoji support (🔒🌟💎⚡)
+- Multi-byte character detection
+- Unicode-aware entropy calculation
+- Automatic "Unicode detected" indicator
+
+#### **Performance Optimizations**
+- **Debounced Input**: 300ms delay prevents lag during fast typing
+- **Efficient Algorithms**: O(n) complexity for most operations
+- **Real-time Character Count**: Live feedback with Unicode awareness
+
+---
+
 ### 🎨 UI/UX Features
 
-- **Real-time Analysis**: Instant feedback as you type
+- **Real-time Analysis**: Instant feedback as you type (with 300ms debounce)
 - **Animated Progress Bars**: Smooth transitions for all metrics
 - **Circular Score Display**: Stunning SVG-based progress ring
 - **Color-Coded Warnings**: Red (Weak), Yellow (Moderate), Green (Strong), Cyan (Cyber-Secure)
 - **Heatmap Visualization**: Character-by-character security breakdown
-- **Passphrase Generator**: Hardened with variable separators and random numbers
+- **Crack Time Calculator**: Visual timeline showing multiple attack scenarios
+- **Keyboard Shortcuts**: 
+  - `Ctrl+I` / `Cmd+I`: Open "How It Works" modal
+  - `Ctrl+G` / `Cmd+G`: Toggle password generator
+  - `Esc`: Close all modals
+- **Reasoned Feedback**: Clear, actionable warning messages explaining security issues
 
 ---
 
@@ -147,13 +246,17 @@ Calculates the time required to crack your password using real-world hashcat ben
 Cyber_project/
 ├── src/
 │   ├── components/
-│   │   ├── App.jsx                    # Main application
-│   │   ├── PasswordInput.jsx          # Input field with live analysis
+│   │   ├── App.jsx                    # Main application with modal integration
+│   │   ├── PasswordInput.jsx          # Enhanced input with debouncing & Unicode
 │   │   ├── PasswordAnalysis.jsx       # Score display & metrics
 │   │   ├── Heatmap.jsx                # Character-level visualization
-│   │   ├── Suggestions.jsx            # Password generator
-│   │   ├── PatternWarning.jsx         # Security alerts
-│   │   └── CrackTimeTable.jsx         # Hash algorithm comparison
+│   │   ├── Suggestions.jsx            # Password suggestions
+│   │   ├── PatternWarning.jsx         # Security alerts with reasoned feedback
+│   │   ├── CrackTimeCalculator.jsx    # Visual timeline for crack scenarios
+│   │   ├── PasswordGenerator.jsx      # Advanced password generator (NEW)
+│   │   ├── HowItWorksModal.jsx        # Educational algorithm explanations (NEW)
+│   │   ├── PrivacyStatement.jsx       # Privacy policy modal (NEW)
+│   │   └── EducationalSection.jsx     # Security tips & resources (NEW)
 │   │
 │   ├── utils/
 │   │   ├── algorithms/
@@ -163,16 +266,18 @@ Cyber_project/
 │   │   │   ├── keyboardGeometry.js    # Spatial analysis
 │   │   │   ├── grammarModeling.js     # Structure detection
 │   │   │   ├── commonPatterns.js      # Regex pattern matching
+│   │   │   ├── breachChecker.js       # Breach database checking (NEW)
 │   │   │   └── crackTime.js           # GPU benchmark calculations
 │   │   │
 │   │   ├── data/
 │   │   │   ├── markovData.js          # Transition matrices & bigrams
 │   │   │   ├── frequencyData.js       # Zipf's law simulation
 │   │   │   ├── keyboardLayouts.js     # QWERTY coordinate map
-│   │   │   └── leakedPatterns.js      # Dark web password database
+│   │   │   ├── leakedPatterns.js      # Dark web password database
+│   │   │   └── breachDatabase.js      # Common breached passwords (NEW)
 │   │   │
 │   │   ├── scoringEngine.js           # Main analysis orchestrator
-│   │   └── generator.js               # Passphrase & suggestion logic
+│   │   └── generator.js               # Enhanced password generation logic
 │   │
 │   ├── index.css                       # Global styles & Tailwind config
 │   └── main.jsx                        # React entry point
@@ -206,6 +311,20 @@ Cyber_project/
    ```
 
 3. **Start development server**
+   
+   **Windows PowerShell** (if execution policy blocks npm):
+   ```powershell
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+   npm run dev
+   ```
+   
+   **Alternative** (use CMD):
+   ```cmd
+   cmd
+   npm run dev
+   ```
+   
+   **Linux/Mac**:
    ```bash
    npm run dev
    ```
@@ -255,18 +374,70 @@ Grammatical complexity of your password.
 - **> 60**: Complex structure
 - **< 50**: Common pattern (e.g., Word+Digit)
 
-### Passphrase Generator
+### Advanced Password Generator
 
-Click **"Generate Passphrase"** to create a secure password like:
+1. Click **"Show Generator"** button (or press `Ctrl+G`)
+2. Choose generation method:
+   - **Random**: For maximum security
+   - **Pronounceable**: For easier memorization
+   - **Passphrase**: For long, secure passwords
+   - **Emoji**: For Unicode-supported systems
+3. Adjust settings (length, character types)
+4. Click **"Copy"** to use the password
+5. Test it in the analyzer above
+
+**Example Generated Passwords:**
 ```
-Falcon#Secure99!Code
+Random:        x9$mQ2#pL7!nK4@vB3
+Pronounceable: Tokale7!
+Passphrase:    Quantum47-Phoenix!Delta92
+Emoji:         Tech🚀Cyber🔒Node⚡
 ```
 
-Features:
-- 4 random words from a curated list
-- Variable separators (`#`, `!`, `-`, `.`, `_`, `$`)
-- Random number inserted at a random position
-- Automatically scores 90-100 (Cyber-Secure)
+### Educational Resources
+
+- Click **"How It Works"** (or press `Ctrl+I`) to learn about the algorithms
+- Click **"Privacy & Security"** in the footer to see the privacy policy
+- Scroll to the educational section after analyzing a password for security tips
+
+---
+
+## 🔍 Verifying Privacy
+
+### No Network Requests Test
+
+1. Open your browser's **Developer Tools** (F12)
+2. Go to the **Network** tab
+3. Enter a password and analyze it
+4. **Verify**: No network requests appear (except initial page load)
+5. **Result**: Your password never leaves your device ✅
+
+---
+
+## 📘 Understanding Warning Messages
+
+The analyzer provides **reasoned feedback** explaining why a password is weak:
+
+| Warning Message | What It Means | Fix |
+|----------------|---------------|-----|
+| 🚨 Password found in breach database | Exact match with common breached password | Change immediately |
+| ⚠️ Contains sequential numbers | Uses patterns like 123, 456, 789 | Use random digits |
+| ⚠️ Contains keyboard patterns | Uses patterns like qwerty, asdf | Avoid keyboard rows |
+| ⚠️ Repeats characters excessively | Too many repeated chars (aaa, 111) | Increase variety |
+| 🕸️ Similar to leaked passwords | High similarity to known leaks | Modify significantly |
+| ⌨️ Keyboard walk detected | Spatial patterns on keyboard | Random placement |
+| 📝 Predictable structure | Common format (Word+Number) | Use passphrases |
+
+---
+
+## ♿ Accessibility Features
+
+- **Keyboard Navigation**: Full support with Tab, Shift+Tab, Enter, Esc
+- **ARIA Labels**: All interactive elements properly labeled
+- **Screen Reader Compatible**: Tested with NVDA and VoiceOver
+- **Keyboard Shortcuts**: Quick access to common actions
+- **Focus Indicators**: Clear visual feedback for keyboard users
+- **Semantic HTML**: Proper structure for assistive technologies
 
 ---
 
@@ -325,13 +496,15 @@ Features:
 
 ### Example Strong Passwords
 
-| Password | Score | Strength |
-|----------|-------|----------|
-| `password123` | 3 | Weak |
-| `P@ssw0rd!` | 28 | Weak |
-| `C0rrectH0rse` | 45 | Moderate |
-| `Falcon#Cyber!2024` | 78 | Strong |
-| `x9$mQ2#pL7!nK4` | 99 | Cyber-Secure |
+| Password | Score | Strength | Notes |
+|----------|-------|----------|-------|
+| `password123` | 3 | Weak | ❌ Found in breach database |
+| `P@ssw0rd!` | 28 | Weak | ❌ Common substitution pattern |
+| `qwerty2024` | 15 | Weak | ❌ Keyboard pattern + year |
+| `C0rrectH0rse` | 45 | Moderate | ⚠️ Predictable structure |
+| `Falcon#Cyber!2024` | 78 | Strong | ✅ Good variety |
+| `x9$mQ2#pL7!nK4` | 99 | Cyber-Secure | ✅ Random & complex |
+| `Quantum47-Phoenix!Delta92` | 95 | Cyber-Secure | ✅ Strong passphrase |
 
 ---
 

@@ -5,6 +5,7 @@ import { calculateKeyboardGeometry } from './algorithms/keyboardGeometry';
 import { analyzeGrammar } from './algorithms/grammarModeling';
 import { calculateCrackTime } from './algorithms/crackTime';
 import { detectCommonPatterns } from './algorithms/commonPatterns';
+import { checkBreach } from './algorithms/breachChecker';
 
 export const analyzePassword = (password) => {
     if (!password) {
@@ -24,6 +25,7 @@ export const analyzePassword = (password) => {
     const geometry = calculateKeyboardGeometry(password);
     const grammar = analyzeGrammar(password);
     const patterns = detectCommonPatterns(password);
+    const breach = checkBreach(password); // Check against breach database
     const crackTime = calculateCrackTime(nngsMetrics.nngs); // Use NNGS (Effective Entropy) for crack time
 
     // 2. Calculate Penalties in BITS (to subtract from Entropy)
@@ -35,28 +37,57 @@ export const analyzePassword = (password) => {
     if (patterns.score < 100) {
         const bits = (100 - patterns.score) * 0.2;
         structurePenaltyBits += bits;
-        warnings.push(...patterns.warnings);
+        // Add reasoned feedback for patterns
+        if (patterns.warnings && patterns.warnings.length > 0) {
+            patterns.warnings.forEach(w => {
+                if (w.includes('sequential')) {
+                    warnings.push('⚠️ Contains sequential numbers - Easily guessable');
+                } else if (w.includes('keyboard')) {
+                    warnings.push('⚠️ Contains keyboard patterns - Very predictable');
+                } else if (w.includes('repeated')) {
+                    warnings.push('⚠️ Repeats characters excessively - Low complexity');
+                } else if (w.includes('year')) {
+                    warnings.push('⚠️ Contains year pattern - Common attack vector');
+                } else if (w.includes('alternating')) {
+                    warnings.push('⚠️ Alternating pattern detected - Weak structure');
+                } else {
+                    warnings.push(w);
+                }
+            });
+        }
+    }
+
+    // Breach Database Check (HIGHEST PRIORITY)
+    if (breach.isBreached) {
+        structurePenaltyBits += breach.penaltyBits;
+        warnings.unshift(breach.message); // Add to front - most critical
     }
 
     // Dark Web Similarity (0-100 score) -> Max ~50 bits penalty (Critical)
     if (darkWeb.score > 0) {
         const bits = darkWeb.score * 0.5;
         structurePenaltyBits += bits;
-        if (darkWeb.score > 30 && darkWeb.message) warnings.push(darkWeb.message);
+        if (darkWeb.score > 30 && darkWeb.message) {
+            warnings.push('🕸️ Similar to leaked passwords - High risk');
+        }
     }
 
     // Keyboard Geometry (0-100 score) -> Max ~15 bits penalty
     if (geometry.score < 100) {
         const bits = (100 - geometry.score) * 0.15;
         structurePenaltyBits += bits;
-        if (geometry.score < 40) warnings.push(geometry.message);
+        if (geometry.score < 40) {
+            warnings.push('⌨️ Keyboard walk detected - Spatial pattern vulnerable');
+        }
     }
 
     // Grammar Structure (0-100 score) -> Max ~10 bits penalty
     if (grammar.score < 100) {
         const bits = (100 - grammar.score) * 0.1;
         structurePenaltyBits += bits;
-        if (grammar.score < 50) warnings.push(grammar.message);
+        if (grammar.score < 50) {
+            warnings.push('📝 Predictable structure detected - Common format (e.g., Word+Number)');
+        }
     }
 
     // 3. Calculate Net Effective Entropy (AI Resistance Input)
@@ -122,7 +153,8 @@ export const analyzePassword = (password) => {
             grammarScore: grammar.score,
             structure: grammar.structure,
             nngs: nngsMetrics, // Pass full NNGS details
-            netEntropy: Math.round(netEntropy) // For debug/display
+            netEntropy: Math.round(netEntropy), // For debug/display
+            breachStatus: breach // Include breach check results
         }
     };
 };

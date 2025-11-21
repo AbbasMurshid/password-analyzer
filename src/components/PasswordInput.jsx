@@ -1,14 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const PasswordInput = ({ value, onChange }) => {
   const [show, setShow] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [localValue, setLocalValue] = useState(value || '');
+  const debounceTimer = useRef(null);
+
+  // Sync with parent value
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
+
+  // Debounced onChange - prevents lag on fast typing
+  const handleChange = (newValue) => {
+    setLocalValue(newValue);
+
+    // Clear existing timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // Set new timer (300ms debounce)
+    debounceTimer.current = setTimeout(() => {
+      onChange(newValue);
+    }, 300);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async () => {
-    if (!value) return;
+    if (!localValue) return;
 
     try {
-      await navigator.clipboard.writeText(value);
+      await navigator.clipboard.writeText(localValue);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -18,27 +49,57 @@ const PasswordInput = ({ value, onChange }) => {
 
   const getCopyButtonClass = () => {
     if (copied) return 'p-2 transition-all rounded-md hover:bg-white/5 text-green-400';
-    if (!value) return 'p-2 transition-all rounded-md hover:bg-white/5 text-slate-700 cursor-not-allowed';
+    if (!localValue) return 'p-2 transition-all rounded-md hover:bg-white/5 text-slate-700 cursor-not-allowed';
     return 'p-2 transition-all rounded-md hover:bg-white/5 text-slate-500 hover:text-cyan-400';
   };
+
+  // Character count with Unicode awareness
+  const charCount = localValue.length;
+  const byteSize = new Blob([localValue]).size;
+  const hasUnicode = byteSize > charCount; // Detects multi-byte characters
+
+  // Use textarea for long passwords (>64 chars)
+  const isLongPassword = charCount > 64;
+
+  const inputClassName = "w-full bg-slate-900 text-white p-6 pr-32 rounded-xl border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 focus:outline-none placeholder-slate-600 font-mono tracking-wider transition-all shadow-2xl";
 
   return (
     <div className="relative w-full max-w-4xl mx-auto group z-20">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
       <div className="relative">
-        <input
-          type={show ? "text" : "password"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="ENTER_PASSWORD_SEQUENCE..."
-          className="w-full bg-slate-900 text-white text-xl p-6 pr-32 rounded-xl border border-slate-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 focus:outline-none placeholder-slate-600 font-mono tracking-wider transition-all shadow-2xl"
-        />
-        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+        {isLongPassword ? (
+          <textarea
+            value={localValue}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder="ENTER_PASSWORD_SEQUENCE..."
+            className={`${inputClassName} text-lg min-h-[120px] resize-y`}
+            style={{ display: show ? 'block' : 'none' }}
+            aria-label="Password input (long mode)"
+          />
+        ) : null}
+        {isLongPassword && !show ? (
+          <div className={`${inputClassName} text-lg min-h-[120px] flex items-center justify-center text-slate-500`}>
+            {localValue.replace(/./g, '•')}
+          </div>
+        ) : null}
+        {!isLongPassword ? (
+          <input
+            type={show ? "text" : "password"}
+            value={localValue}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder="ENTER_PASSWORD_SEQUENCE..."
+            className={`${inputClassName} text-xl`}
+            aria-label="Password input"
+          />
+        ) : null}
+
+        <div className="absolute right-4 top-6 flex items-center gap-2">
           <button
             onClick={handleCopy}
-            disabled={!value}
+            disabled={!localValue}
             className={getCopyButtonClass()}
             title={copied ? "Copied!" : "Copy password"}
+            aria-label={copied ? "Copied" : "Copy password"}
           >
             {copied ? (
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -55,6 +116,7 @@ const PasswordInput = ({ value, onChange }) => {
             onClick={() => setShow(!show)}
             className="p-2 text-slate-500 hover:text-cyan-400 transition-colors rounded-md hover:bg-white/5"
             title={show ? "Hide password" : "Show password"}
+            aria-label={show ? "Hide password" : "Show password"}
           >
             {show ? (
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -69,6 +131,28 @@ const PasswordInput = ({ value, onChange }) => {
           </button>
         </div>
       </div>
+
+      {/* Character Count and Info */}
+      <div className="flex items-center justify-between mt-2 text-xs">
+        <div className="flex items-center gap-4 text-slate-500">
+          <span>
+            <span className="text-slate-400 font-mono">{charCount}</span> characters
+            {hasUnicode && <span className="ml-2 text-cyan-400">✨ Unicode detected</span>}
+          </span>
+          {charCount > 64 && (
+            <span className="text-green-400 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Extra strong length
+            </span>
+          )}
+        </div>
+        <div className="text-slate-600">
+          Max: 128 chars
+        </div>
+      </div>
+
       <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
     </div>
   );

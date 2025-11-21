@@ -131,3 +131,165 @@ body {
     transform: translate(0)
   }
 }
+
+/* ==================== ACCESSIBILITY FEATURES ==================== */
+
+/* Improved Focus Indicators - WCAG 2.1 AA Compliant */
+*:focus {
+  outline: 2px solid theme('colors.cyan.400');
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid theme('colors.cyan.400');
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High-Visibility Focus for Interactive Elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid theme('colors.cyan.300');
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(0, 243, 255, 0.2);
+}
+
+/* Skip Links for Keyboard Navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: theme('colors.cyan.500');
+  color: theme('colors.slate-900');
+  padding: 8px 16px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  body {
+    background-image: none;
+    background-color: #000000;
+  }
+
+  .glass-panel {
+    @apply bg-slate-900 border-2 border-white/50;
+    backdrop-filter: none;
+  }
+
+  .text-slate-400,
+  .text-slate-500,
+  .text-slate-600 {
+    color: #ffffff !important;
+  }
+
+  button,
+  a {
+    border: 2px solid currentColor;
+  }
+
+  /* Increase contrast for all text */
+  * {
+    text-shadow: none !important;
+  }
+}
+
+/* Forced High Contrast Mode (User Toggle) */
+.high-contrast-mode {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+.high-contrast-mode .glass-panel {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  backdrop-filter: none !important;
+}
+
+.high-contrast-mode .text-slate-400,
+.high-contrast-mode .text-slate-500,
+.high-contrast-mode .text-slate-600,
+.high-contrast-mode .text-slate-700 {
+  color: #ffffff !important;
+}
+
+.high-contrast-mode button,
+.high-contrast-mode a {
+  border: 2px solid currentColor !important;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .bg-grid {
+    animation: none !important;
+  }
+
+  .glitch-hover:hover {
+    animation: none !important;
+  }
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus Trap for Modals */
+.modal-focus-trap {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+/* Accessible Color Combinations - WCAG AA Compliant */
+.text-accessible-cyan {
+  color: #7df9ff; /* Lighter cyan for better contrast */
+}
+
+.text-accessible-purple {
+  color: #e899ff; /* Lighter purple for better contrast */
+}
+
+/* Mobile Touch Target Size - Minimum 44x44px */
+@media (max-width: 768px) {
+  button,
+  a,
+  input,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
