@@ -9,6 +9,10 @@ A state-of-the-art password security analysis tool powered by modern AI-resistan
 ![Tailwind](https://img.shields.io/badge/tailwind-3.4.17-38bdf8.svg)
 
 ---
+## ❤️ Support This Project
+If this project helps you, consider sponsoring me on GitHub.
+
+👉 Click the Sponsor button above.
 
 ## 🌟 Features
 
